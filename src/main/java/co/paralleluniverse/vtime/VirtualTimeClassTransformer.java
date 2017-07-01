@@ -29,6 +29,7 @@ public class VirtualTimeClassTransformer extends ASMClassFileTransformer {
         return new ClassVisitor(Opcodes.ASM5, next) {
             @Override
             public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
+
                 return new MethodVisitor(api, super.visitMethod(access, name, desc, signature, exceptions)) {
                     @Override
                     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
@@ -43,11 +44,10 @@ public class VirtualTimeClassTransformer extends ASMClassFileTransformer {
                                     return callClockMethod("Object_wait", instanceToStatic(owner, desc));
                                 break;
                             case "java/lang/System":
-                                switch (name) {
-                                    case "nanoTime":
-                                        return callClockMethod("System_nanoTime", desc);
-                                    case "currentTimeMillis":
-                                        return callClockMethod("System_currentTimeMillis", desc);
+                                if ("nanoTime".equals(name)) {
+                                  return callClockMethod("System_nanoTime", desc);
+                                } else if ("currentTimeMillis".equals(name)) {
+                                  return callClockMethod("System_currentTimeMillis", desc);
                                 }
                                 break;
                             case "java/lang/Thread":
@@ -58,7 +58,9 @@ public class VirtualTimeClassTransformer extends ASMClassFileTransformer {
                                 if ("park".equals(name))
                                     return callClockMethod("Unsafe_park", instanceToStatic(owner, desc));
                                 break;
+                            default:
                         }
+
                         return false;
                     }
 

@@ -6,10 +6,12 @@
  */
 package co.paralleluniverse.vtime;
 
+@SuppressWarnings("unused")
 public final class Clock_ {
     private Clock_() {
     }
 
+    @SuppressWarnings("unused")
     public static long System_currentTimeMillis() {
         return VirtualClock.get().System_currentTimeMillis();
     }

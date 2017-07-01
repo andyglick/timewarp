@@ -11,6 +11,7 @@ package co.paralleluniverse.vtime;
  *
  * @author pron
  */
+@SuppressWarnings("WeakerAccess")
 public final class VirtualClock {
     private static Clock gClock; // lowest priority note that this isn't volatile
     private static final InheritableThreadLocal<Clock> itlClock = new InheritableThreadLocal<>(); // medium priority
@@ -44,6 +45,7 @@ public final class VirtualClock {
      * Puts the given clock in effect for future child threads -- <b>but not the current thread</b> --
      * unless overridden by {@link #setForCurrentThread(Clock) setForCurrentThread}.
      */
+    @SuppressWarnings("unused")
     public static void setForChildThreads(Clock clock) {
         final Clock current = get();
         setForCurrentThreadAndChildren(clock);
@@ -55,6 +57,7 @@ public final class VirtualClock {
      * unless overridden by {@link #setForCurrentThread(Clock) setForCurrentThread}
      * or by {@link #setForCurrentThreadAndChildren(Clock) setForCurrentThreadAndChildren}.
      */
+    @SuppressWarnings("unused")
     public static void setGlobalExceptCurrentThread(Clock clock) {
         final Clock current = get();
         setGlobal(clock);

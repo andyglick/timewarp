@@ -25,6 +25,7 @@ public final class ManualClock extends Clock {
      *
      * @param startTime the initial time which will be returned by {@code System.currentTimeMillis()}.
      */
+    @SuppressWarnings("WeakerAccess")
     public ManualClock(long startTime) {
         if (startTime < 0)
             throw new IllegalArgumentException("startTime must be >= 0; was " + startTime);
@@ -37,6 +38,7 @@ public final class ManualClock extends Clock {
      * <p>
      * Same as {@link #ManualClock(long) ManualClock(System.currentTimeMillis()}.
      */
+    @SuppressWarnings("unused")
     public ManualClock() {
         this(System.currentTimeMillis());
     }
@@ -52,6 +54,7 @@ public final class ManualClock extends Clock {
      * @param duration the time duration
      * @param unit     the time duration's unit
      */
+    @SuppressWarnings("WeakerAccess")
     public synchronized void advance(long duration, TimeUnit unit) {
         if (duration <= 0)
             throw new IllegalArgumentException("Duration must be positive; was " + duration);
@@ -84,6 +87,7 @@ public final class ManualClock extends Clock {
             obj.wait(timeout);
         else {
             final long deadline = nanos + TimeUnit.MILLISECONDS.toNanos(timeout);
+
             try {
                 InterruptScheduled s = interrupt(deadline, Thread.currentThread());
                 waiters.add(s);
@@ -138,6 +142,7 @@ public final class ManualClock extends Clock {
         final long deadline;
         final Thread thread;
 
+        @SuppressWarnings("WeakerAccess")
         public Scheduled(long deadline, Thread thread) {
             this.deadline = deadline;
             this.thread = thread;
@@ -148,7 +153,26 @@ public final class ManualClock extends Clock {
             return signum(deadline - o.deadline);
         }
 
-        public abstract void wakeup();
+      @Override
+      public boolean equals(Object o)
+      {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Scheduled scheduled = (Scheduled) o;
+
+        return deadline == scheduled.deadline && thread.equals(scheduled.thread);
+      }
+
+      @Override
+      public int hashCode()
+      {
+        int result = (int) (deadline ^ (deadline >>> 32));
+        result = 31 * result + thread.hashCode();
+        return result;
+      }
+
+      public abstract void wakeup();
     }
 
     static int signum(long x) {
@@ -172,10 +196,12 @@ public final class ManualClock extends Clock {
     private static class InterruptScheduled extends Scheduled {
         private volatile boolean disabled;
 
+        @SuppressWarnings("WeakerAccess")
         public InterruptScheduled(long deadline, Thread thread) {
             super(deadline, thread);
         }
 
+        @SuppressWarnings("WeakerAccess")
         public void disable() {
             disabled = true;
         }
@@ -185,5 +211,25 @@ public final class ManualClock extends Clock {
             if (!disabled)
                 thread.interrupt();
         }
+
+      @Override
+      public boolean equals(Object o)
+      {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        InterruptScheduled that = (InterruptScheduled) o;
+
+        return disabled == that.disabled;
+      }
+
+      @Override
+      public int hashCode()
+      {
+        int result = super.hashCode();
+        result = 31 * result + (disabled ? 1 : 0);
+        return result;
+      }
     }
 }

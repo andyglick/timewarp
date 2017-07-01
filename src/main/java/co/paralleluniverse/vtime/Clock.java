@@ -15,10 +15,10 @@ package co.paralleluniverse.vtime;
  *
  * @author pron
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class Clock {
     // for now, allow implementations in this package only
-    Clock() {
-    }
+    Clock() {}
 
     /**
      * Returns this clock's current time in milliseconds.
