@@ -15,3 +15,9 @@ private/
 .bdb/
 log4j.xml
 /push_docs.sh
+target/
+
+.idea/
+*.iml
+*.ipr
+*.iws
